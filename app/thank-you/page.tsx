@@ -10,6 +10,7 @@ import {
   coursePlatformOrHubHref,
 } from "@/lib/constants";
 import { createMetadata } from "@/lib/metadata";
+import { getStripe } from "@/lib/stripe";
 
 export const metadata: Metadata = createMetadata({
   title: "Welcome — your access is on the way",
@@ -18,7 +19,30 @@ export const metadata: Metadata = createMetadata({
   robots: { index: false, follow: false },
 });
 
-export default function ThankYouPage() {
+type ThankYouPageProps = {
+  searchParams: Promise<{ session_id?: string }>;
+};
+
+export default async function ThankYouPage({ searchParams }: ThankYouPageProps) {
+  const { session_id } = await searchParams;
+
+  let paymentConfirmed = false;
+  let payerEmail: string | null = null;
+
+  if (session_id?.trim() && process.env.STRIPE_SECRET_KEY) {
+    try {
+      const stripe = getStripe();
+      const session = await stripe.checkout.sessions.retrieve(session_id.trim());
+      if (session.payment_status === "paid") {
+        paymentConfirmed = true;
+        payerEmail =
+          session.customer_details?.email ?? session.customer_email ?? null;
+      }
+    } catch {
+      // Invalid or expired session id — still show generic thank-you.
+    }
+  }
+
   return (
     <div className="bg-cream py-section-y lg:py-section-y-lg">
       <Container>
@@ -26,6 +50,20 @@ export default function ThankYouPage() {
           <h1 className="font-heading text-3xl font-semibold tracking-tight text-taupe sm:text-4xl">
             Welcome — your access is on the way
           </h1>
+
+          {paymentConfirmed ? (
+            <p className="mt-6 rounded-button border border-success/30 bg-success/10 px-4 py-3 text-base text-taupe">
+              <strong className="font-semibold text-taupe">Payment received.</strong>
+              {payerEmail ? (
+                <>
+                  {" "}
+                  We have <span className="text-brown">{payerEmail}</span> on file for your
+                  receipt.
+                </>
+              ) : null}
+            </p>
+          ) : null}
+
           <ul className="mt-8 space-y-4 text-base leading-relaxed text-taupe">
             <li>
               Check your email for login details from your course platform. Use the same

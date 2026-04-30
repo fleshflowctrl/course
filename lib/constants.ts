@@ -1,6 +1,3 @@
-/** Replace with Coachy / Plug&Pay / Teachable checkout URL. */
-export const CHECKOUT_URL = "https://checkout.example.com";
-
 /**
  * Where paying customers log in and watch lessons (Coachy, Teachable, etc.).
  * Set in `.env.local` or Vercel:
