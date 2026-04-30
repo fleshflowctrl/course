@@ -1,4 +1,6 @@
 import Image from "next/image";
+import { COURSE_MODULES } from "@/content/course-data";
+import { Card } from "@/components/ui/Card";
 import { CheckoutLink } from "@/components/ui/CheckoutLink";
 import { Container } from "@/components/ui/Container";
 
@@ -17,8 +19,8 @@ export function Hero() {
       aria-labelledby="hero-heading"
     >
       <Container>
-        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
-          <div className="max-w-xl lg:max-w-none">
+        <div className="grid items-start gap-10 lg:grid-cols-2 lg:gap-14">
+          <div className="max-w-xl lg:max-w-none lg:pt-2">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-brown sm:text-sm">
               Perimenopause course for women 40+
             </p>
@@ -64,17 +66,70 @@ export function Hero() {
             </p>
           </div>
 
-          <div className="relative mx-auto w-full max-w-md lg:max-w-none">
-            <div className="relative aspect-[4/5] overflow-hidden rounded-card shadow-warm lg:aspect-[3/4]">
-              <Image
-                src={HERO_IMAGE}
-                alt="Woman seated in calm, warm light — placeholder photo for the course."
-                fill
-                priority
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-cover object-center"
-              />
+          <div className="mx-auto flex w-full max-w-md flex-col gap-10 lg:mx-0 lg:max-w-none">
+            <div className="relative mx-auto w-full max-w-md lg:mx-0 lg:max-w-none">
+              <div className="relative aspect-[4/5] overflow-hidden rounded-card shadow-warm lg:aspect-[3/4]">
+                <Image
+                  src={HERO_IMAGE}
+                  alt="Woman seated in calm, warm light — placeholder photo for the course."
+                  fill
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="object-cover object-center"
+                />
+              </div>
             </div>
+
+            <CheckoutLink
+              source="hero_image_below"
+              size="lg"
+              className="w-full justify-center"
+              aria-label="Get started for 39 euros"
+            >
+              Get started — €39
+            </CheckoutLink>
+
+            <div
+              className="w-full"
+              aria-labelledby="hero-outline-heading"
+            >
+              <h2
+                id="hero-outline-heading"
+                className="font-heading text-2xl font-semibold tracking-tight text-taupe sm:text-3xl"
+              >
+                What each video covers
+              </h2>
+              <p className="mt-2 text-base leading-relaxed text-brown sm:text-lg">
+                All 30 lessons, listed in order — so you know exactly what you&apos;re getting
+                before you join.
+              </p>
+              <div className="mt-6 space-y-5">
+                {COURSE_MODULES.map((mod) => (
+                  <Card key={mod.id} className="p-5 sm:p-6">
+                    <h3 className="font-heading text-lg font-semibold tracking-tight text-taupe sm:text-xl">
+                      {mod.title}
+                      <span className="ml-1.5 font-sans text-base font-normal text-brown">
+                        ({mod.videoCount} videos)
+                      </span>
+                    </h3>
+                    <ol className="mt-4 list-decimal space-y-2.5 pl-5 text-base leading-snug text-taupe marker:text-brown">
+                      {mod.videos.map((title) => (
+                        <li key={title}>{title}</li>
+                      ))}
+                    </ol>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            <CheckoutLink
+              source="hero_curriculum_below"
+              size="lg"
+              className="w-full justify-center"
+              aria-label="Get started for 39 euros"
+            >
+              Get started — €39
+            </CheckoutLink>
           </div>
         </div>
       </Container>
