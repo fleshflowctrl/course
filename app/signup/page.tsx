@@ -69,8 +69,9 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
             Create your account
           </h1>
           <p className="mt-3 text-base leading-relaxed text-brown">
-            Your payment went through. Set a password for this site to open your lesson list
-            and continue to your video host when you&apos;re ready.
+            Your payment is confirmed. Choose a password once — then you&apos;ll go straight
+            to your lesson list (each checkout link can only be used once to create an
+            account).
           </p>
 
           {!hasServiceRole ? (

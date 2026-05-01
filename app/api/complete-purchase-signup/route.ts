@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import {
+  getPurchaseSignupState,
+  insertPurchaseFromCheckout,
+  markPurchaseSignupComplete,
+} from "@/lib/purchases";
 import { getStripe } from "@/lib/stripe";
 import { createAdminClient } from "@/utils/supabase/admin";
 
@@ -18,13 +23,14 @@ export async function POST(request: Request) {
     }
 
     const { session_id, password } = parsed.data;
+    const sessionId = session_id.trim();
 
     if (!process.env.STRIPE_SECRET_KEY) {
       return NextResponse.json({ error: "Payments not configured" }, { status: 503 });
     }
 
     const stripe = getStripe();
-    const session = await stripe.checkout.sessions.retrieve(session_id.trim());
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
 
     if (session.payment_status !== "paid") {
       return NextResponse.json({ error: "Payment not completed for this session" }, { status: 403 });
@@ -53,7 +59,29 @@ export async function POST(request: Request) {
       );
     }
 
-    const { error } = await admin.auth.admin.createUser({
+    let state = await getPurchaseSignupState(admin, sessionId);
+    if (!state) {
+      await insertPurchaseFromCheckout(admin, {
+        stripe_checkout_session_id: sessionId,
+        email,
+        amount_total: session.amount_total,
+        currency: session.currency,
+      });
+      state = await getPurchaseSignupState(admin, sessionId);
+    }
+
+    if (state?.signup_completed_at) {
+      return NextResponse.json(
+        {
+          error:
+            "This checkout link was already used to create an account. Log in with your email.",
+          code: "session_consumed",
+        },
+        { status: 403 },
+      );
+    }
+
+    const { data, error } = await admin.auth.admin.createUser({
       email,
       password,
       email_confirm: true,
@@ -79,6 +107,15 @@ export async function POST(request: Request) {
       }
       console.error("[complete-purchase-signup]", error);
       return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
+    const userId = data.user?.id;
+    if (userId) {
+      try {
+        await markPurchaseSignupComplete(admin, sessionId, userId);
+      } catch (e) {
+        console.error("[complete-purchase-signup] purchase update failed", e);
+      }
     }
 
     return NextResponse.json({ ok: true, email });

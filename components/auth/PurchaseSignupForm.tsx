@@ -48,7 +48,11 @@ export function PurchaseSignupForm({ sessionId, email }: Props) {
           typeof data.error === "string"
             ? data.error
             : "Could not create your account.";
-        throw new Error(msg);
+        const err = new Error(msg) as Error & { code?: string };
+        if (typeof data === "object" && data && "code" in data) {
+          err.code = String((data as { code?: string }).code);
+        }
+        throw err;
       }
 
       const supabase = createClient();
@@ -125,7 +129,7 @@ export function PurchaseSignupForm({ sessionId, email }: Props) {
           role="alert"
         >
           {error}{" "}
-          {error.includes("already exists") ? (
+          {error.includes("already exists") || error.includes("already used") ? (
             <Link
               href={`/login?redirectTo=${encodeURIComponent("/course")}`}
               className="font-semibold underline underline-offset-2"

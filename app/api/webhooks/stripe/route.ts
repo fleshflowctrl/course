@@ -1,7 +1,9 @@
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
+import { insertPurchaseFromCheckout } from "@/lib/purchases";
 import { getStripe } from "@/lib/stripe";
+import { createAdminClient } from "@/utils/supabase/admin";
 
 export async function POST(request: Request) {
   const secret = process.env.STRIPE_WEBHOOK_SECRET?.trim();
@@ -30,18 +32,31 @@ export async function POST(request: Request) {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
-    const email =
-      session.customer_details?.email ?? session.customer_email ?? undefined;
-    const amount = session.amount_total;
 
-    // Fulfillment hook: invite to Supabase / send email / unlock LMS — wire here.
-    console.info("[stripe webhook] checkout.session.completed", {
-      sessionId: session.id,
-      email,
-      amount,
-      currency: session.currency,
-      paymentStatus: session.payment_status,
-    });
+    if (session.payment_status !== "paid") {
+      return NextResponse.json({ received: true, skipped: "not_paid" });
+    }
+
+    const emailRaw =
+      session.customer_details?.email ?? session.customer_email ?? null;
+    const email = emailRaw?.trim().toLowerCase() ?? null;
+    if (!email) {
+      console.warn("[stripe webhook] paid session without email", session.id);
+      return NextResponse.json({ received: true, skipped: "no_email" });
+    }
+
+    try {
+      const admin = createAdminClient();
+      await insertPurchaseFromCheckout(admin, {
+        stripe_checkout_session_id: session.id,
+        email,
+        amount_total: session.amount_total,
+        currency: session.currency,
+      });
+    } catch (e) {
+      console.error("[stripe webhook] purchase insert failed", e);
+      return NextResponse.json({ error: "Fulfillment write failed" }, { status: 500 });
+    }
   }
 
   return NextResponse.json({ received: true });
