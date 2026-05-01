@@ -5,6 +5,7 @@ export type PurchaseRow = {
   email: string;
   amount_total: number | null;
   currency: string | null;
+  package_id: string | null;
   user_id: string | null;
   signup_completed_at: string | null;
   created_at: string;
@@ -13,13 +14,17 @@ export type PurchaseRow = {
 /** Insert from Stripe; safe if webhook + API race (unique session id). */
 export async function insertPurchaseFromCheckout(
   admin: SupabaseClient,
-  row: Pick<PurchaseRow, "stripe_checkout_session_id" | "email" | "amount_total" | "currency">,
+  row: Pick<
+    PurchaseRow,
+    "stripe_checkout_session_id" | "email" | "amount_total" | "currency" | "package_id"
+  >,
 ): Promise<void> {
   const { error } = await admin.from("purchases").insert({
     stripe_checkout_session_id: row.stripe_checkout_session_id,
     email: row.email,
     amount_total: row.amount_total ?? 0,
     currency: row.currency ?? "eur",
+    package_id: row.package_id ?? null,
   });
 
   if (

@@ -59,6 +59,11 @@ export async function POST(request: Request) {
       );
     }
 
+    const packageId =
+      typeof session.metadata?.package_id === "string"
+        ? session.metadata.package_id.trim() || null
+        : null;
+
     let state = await getPurchaseSignupState(admin, sessionId);
     if (!state) {
       await insertPurchaseFromCheckout(admin, {
@@ -66,6 +71,7 @@ export async function POST(request: Request) {
         email,
         amount_total: session.amount_total,
         currency: session.currency,
+        package_id: packageId,
       });
       state = await getPurchaseSignupState(admin, sessionId);
     }
@@ -87,6 +93,7 @@ export async function POST(request: Request) {
       email_confirm: true,
       user_metadata: {
         stripe_checkout_session_id: session.id,
+        ...(packageId ? { package_id: packageId } : {}),
       },
     });
 

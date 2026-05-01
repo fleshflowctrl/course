@@ -3,6 +3,7 @@ import { COURSE_MODULES } from "@/content/course-data";
 import { Card } from "@/components/ui/Card";
 import { CheckoutLink } from "@/components/ui/CheckoutLink";
 import { Container } from "@/components/ui/Container";
+import { LOWEST_PACKAGE_LABEL } from "@/lib/packages";
 
 /**
  * Hero image: replace with licensed photography.
@@ -32,16 +33,17 @@ export function Hero() {
             </h1>
             <p className="mt-6 text-lg leading-relaxed text-taupe sm:text-[22px] sm:leading-relaxed">
               30 video lessons explaining perimenopause and menopause from a real medical
-              specialist. Lifetime access. €39 once.
+              specialist. Packages from {LOWEST_PACKAGE_LABEL} to €19.95 — choose yours in the
+              picker, then pay with Stripe. Lifetime access.
             </p>
             <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
               <CheckoutLink
                 source="hero"
                 size="lg"
                 className="w-full justify-center sm:w-auto"
-                aria-label="Get instant access for 39 euros"
+                aria-label={`Choose a course package from ${LOWEST_PACKAGE_LABEL} before checkout`}
               >
-                Get instant access — €39
+                Choose your package — from {LOWEST_PACKAGE_LABEL}
               </CheckoutLink>
             </div>
             <p className="mt-6 flex flex-col gap-2 text-sm leading-relaxed text-brown sm:flex-row sm:flex-wrap sm:gap-x-4 sm:gap-y-1 sm:text-base">
@@ -84,9 +86,9 @@ export function Hero() {
               source="hero_image_below"
               size="lg"
               className="w-full justify-center"
-              aria-label="Get started for 39 euros"
+              aria-label={`Choose a course package from ${LOWEST_PACKAGE_LABEL} before checkout`}
             >
-              Get started — €39
+              Choose your package — from {LOWEST_PACKAGE_LABEL}
             </CheckoutLink>
 
             <div
@@ -126,9 +128,9 @@ export function Hero() {
               source="hero_curriculum_below"
               size="lg"
               className="w-full justify-center"
-              aria-label="Get started for 39 euros"
+              aria-label={`Choose a course package from ${LOWEST_PACKAGE_LABEL} before checkout`}
             >
-              Get started — €39
+              Choose your package — from {LOWEST_PACKAGE_LABEL}
             </CheckoutLink>
           </div>
         </div>

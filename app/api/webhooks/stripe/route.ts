@@ -47,11 +47,17 @@ export async function POST(request: Request) {
 
     try {
       const admin = createAdminClient();
+      const packageId =
+        typeof session.metadata?.package_id === "string"
+          ? session.metadata.package_id.trim() || null
+          : null;
+
       await insertPurchaseFromCheckout(admin, {
         stripe_checkout_session_id: session.id,
         email,
         amount_total: session.amount_total,
         currency: session.currency,
+        package_id: packageId,
       });
     } catch (e) {
       console.error("[stripe webhook] purchase insert failed", e);

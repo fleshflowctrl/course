@@ -20,7 +20,7 @@ const fraunces = Fraunces({
 export const metadata: Metadata = createMetadata({
   title: { absolute: "Perimenopause Course — Understand your body" },
   description:
-    "30 video lessons on perimenopause and menopause from a medical specialist. Lifetime access. €39 once.",
+    "30 video lessons on perimenopause and menopause from a medical specialist. Packages from €12.95 to €19.95; choose yours at checkout. Lifetime access.",
 });
 
 export default function RootLayout({
