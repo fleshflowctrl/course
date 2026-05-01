@@ -177,6 +177,11 @@ export function CheckoutLink({
                           className="mt-1 h-4 w-4 shrink-0 accent-terracotta"
                         />
                         <span className="min-w-0 flex-1">
+                          {"mostPopular" in pkg && pkg.mostPopular ? (
+                            <span className="mb-2 block w-fit rounded-full bg-terracotta px-2.5 py-0.5 text-center text-xs font-semibold uppercase tracking-wide text-white shadow-sm">
+                              Most popular
+                            </span>
+                          ) : null}
                           <span className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5">
                             <span className="font-heading text-lg font-semibold text-taupe">
                               {pkg.title}

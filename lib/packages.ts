@@ -26,6 +26,7 @@ export const PACKAGES = [
     subtitle: "All 4 modules (30 videos)",
     description:
       "Complete access: treatment options, practical life, scripts for doctors and partners, and the full curriculum.",
+    mostPopular: true,
   },
 ] as const;
 
